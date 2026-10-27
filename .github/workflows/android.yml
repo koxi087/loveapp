@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # Így kézzel is elindíthatjuk bármikor
 
 jobs:
   build:
@@ -13,16 +14,17 @@ jobs:
     - name: Kód letöltése a repóból
       uses: actions/checkout@v4
 
-    - name: Mappaszerkezet helyreállítása a szerveren
+    - name: Teljes projektstruktúra és Gradle wrapper generálása
       run: |
-        # Létrehozzuk az app mappát a szerveren
+        # Biztosítjuk a mappákat
         mkdir -p app
-        
-        # Átmozgatjuk az app-szintű gradle fájlt a helyére
-        if [ -f build.gradle.kts ]; then
+        mkdir -p gradle/wrapper
+
+        # Áthelyezzük az app-szintű build fájlt, ha kint maradt
+        if [ -f build.gradle.kts ] && [ ! -d app/src ]; then
           mv build.gradle.kts app/
         fi
-        
+
         # Kicsomagoljuk a forráskódot az app mappába
         if [ -f src.zip ]; then
           cd app
@@ -30,9 +32,16 @@ jobs:
           rm ../src.zip
           cd ..
         fi
-        
-        # Legenerálunk egy üres, de kötelező felső szintű build fájlt a gyökérbe
-        echo 'plugins { alias(libs.plugins.android.application) apply false; alias(libs.plugins.kotlin.android) apply false }' > build.gradle.kts
+
+        # Legeneráljuk a hiányzó gyökér build.gradle.kts-t
+        echo 'plugins { id("com.android.application") version "8.2.0" apply false; id("org.jetbrains.kotlin.android") version "1.9.0" apply false }' > build.gradle.kts
+
+        # Legeneráljuk a gyári gradle-wrapper.properties-t a megfelelő helyre
+        echo -e "distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionUrl=https\\\\://services.gradle.org/distributions/gradle-8.2-bin.zip\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists" > gradle/wrapper/gradle-wrapper.properties
+
+        # Ha a gradlew fájl hiányzik vagy hibás, letöltünk egy gyárit, hogy biztosan fusson
+        curl -sL https://githubusercontent.com -o gradlew
+        chmod +x gradlew
 
     - name: Java 17 környezet beállítása
       uses: actions/setup-java@v4
@@ -40,11 +49,8 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Gradle futtatási jogok megadása
-      run: chmod +x ./gradlew
-
     - name: APK fájl legenerálása (Debug Build)
-      run: ./gradlew assembleDebug
+      run: ./gradlew assembleDebug --no-daemon
 
     - name: Kész APK feltöltése a GitHubra letölthetőként
       uses: actions/upload-artifact@v4
