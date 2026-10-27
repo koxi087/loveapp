@@ -39,7 +39,11 @@ jobs:
           rm -f src.zip
         fi
 
-    - name: Futtatási jog megadása a meglévő gradlew fájlnak
+    - name: Gradle Wrapper JAR letöltése a helyére
+      run: |
+        curl -sL https://githubusercontent.com -o gradle/wrapper/gradle-wrapper.jar
+
+    - name: Futtatasi jog megadasa a megleveo gradlew fajlnak
       run: chmod +x gradlew
 
     - name: APK generalasa
