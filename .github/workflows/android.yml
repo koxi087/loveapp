@@ -33,12 +33,14 @@ jobs:
           rm -f src.zip
         fi
 
+    - name: Konfiguracios fajlok helyreallitasa
+      run: |
+        if [ -f build.gradle.kts ]; then mv build.gradle.kts app/; fi
+        echo 'plugins { id("com.android.application") version "8.2.0" apply false; id("org.jetbrains.kotlin.android") version "1.9.0" apply false }' > build.gradle.kts
+        echo -e "distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionUrl=https\\\\://services.gradle.org/distributions/gradle-8.2-bin.zip\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists" > gradle/wrapper/gradle-wrapper.properties
+
     - name: Hibas build gradle faluiras es helyreallitas
       run: |
-        # Legenerálunk egy fix, független globális konfigurációt
-        echo 'plugins { id("com.android.application") version "8.2.0" apply false; id("org.jetbrains.kotlin.android") version "1.9.0" apply false }' > build.gradle.kts
-        
-        # Felülírjuk az app szintű fájlt egy olyan verzióra, amihez nem kell a hiányzó libs verziókatalógus
         cat << 'EOF' > app/build.gradle.kts
         plugins {
             id("com.android.application")
@@ -90,10 +92,7 @@ jobs:
         }
         EOF
 
-        # Beállítjuk a tiszta Gradle indítót
-        echo -e "distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionUrl=https\\\\://services.gradle.org/distributions/gradle-8.2-bin.zip\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists" > gradle/wrapper/gradle-wrapper.properties
-
-    - name: Futtatasi jog biztosítása
+    - name: Futtatasi jog biztositasa
       run: |
         curl -sL https://githubusercontent.com -o gradlew
         chmod +x gradlew
