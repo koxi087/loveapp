@@ -19,6 +19,11 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
+    - name: Gradle 8.5 beallitasa
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: 8.5
+
     - name: Alap mappak letrehozasa
       run: |
         mkdir -p app
@@ -90,7 +95,7 @@ jobs:
         }
         EOF
 
-    - name: APK generalasa gyari forditoval
+    - name: APK generalasa
       run: gradle assembleDebug --no-daemon
 
     - name: APK feltoltese
