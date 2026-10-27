@@ -39,10 +39,8 @@ jobs:
           rm -f src.zip
         fi
 
-    - name: Gradle indito letoltese
-      run: |
-        curl -sL https://githubusercontent.com -o gradlew
-        chmod +x gradlew
+    - name: Futtatási jog megadása a meglévő gradlew fájlnak
+      run: chmod +x gradlew
 
     - name: APK generalasa
       run: ./gradlew assembleDebug --no-daemon
