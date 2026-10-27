@@ -1,0 +1,13 @@
+Copyright (c) 2026 Máté Döge. All Rights Reserved.
+
+1. OWNERSHIP AND INTELLECTUAL PROPERTY
+This software and its entire source code are the exclusive intellectual property of the author. No one is permitted to copy, modify, distribute, reuse, reproduce, or reverse engineer any part of this code without the express, prior written permission of the author. The author retains the sole right to develop and modify this application.
+
+2. COMMERCIAL USE AND MONETIZATION LIMITATIONS
+This application is currently provided free of charge for entertainment purposes and does not serve as a source of income. However, this status is not permanent, and the author reserves the right to monetize the application in the future. Third parties are strictly prohibited from selling, leasing, monetizing, or generating any form of revenue from this software, its binaries (APK), or its source code.
+
+3. EXCLUSION OF LIABILITY (WARRANTY DISCLAIMER)
+This application is published on an open, public platform in good faith. The software is provided "AS IS", without any warranties of any kind. The author shall not be held liable or legally responsible for any bugs, errors, software crashes, data loss, hardware malfunctions, or any direct or indirect damages resulting from the download, installation, or use of this application. Users download and use this software entirely at their own risk.
+
+4. RIGHTS TO UPDATES, FILE MANAGEMENT, AND LOGGING
+All future updates, modifications, and feature implementations remain the exclusive right of the author, provided solely on a voluntary basis with no legal obligation to do so. The author reserves the absolute right to manage application-related files on the user's device and to implement activity logging within the application for maintenance, performance tracking, or analytical purposes, as deemed necessary for the operation of the software.
