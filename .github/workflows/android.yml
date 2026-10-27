@@ -19,14 +19,28 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Projekt szerkezet felépítése
+    - name: Alap mappak letrehozasa
       run: |
         mkdir -p app
         mkdir -p gradle/wrapper
+
+    - name: Konfiguracios fajlok helyreallitasa
+      run: |
         if [ -f build.gradle.kts ]; then mv build.gradle.kts app/; fi
-        if [ -f src.zip ]; then cd app && (unzip -o ../src.zip || true) && rm -f ../src.zip && cd ..; fi
         echo 'plugins { id("com.android.application") version "8.2.0" apply false; id("org.jetbrains.kotlin.android") version "1.9.0" apply false }' > build.gradle.kts
         echo -e "distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionUrl=https\\\\://services.gradle.org/distributions/gradle-8.2-bin.zip\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists" > gradle/wrapper/gradle-wrapper.properties
+
+    - name: Forraskod kicsomagolasa
+      run: |
+        if [ -f src.zip ]; then
+          cd app
+          unzip -qq -o ../src.zip || true
+          cd ..
+          rm -f src.zip
+        fi
+
+    - name: Gradle indito letoltese
+      run: |
         curl -sL https://githubusercontent.com -o gradlew
         chmod +x gradlew
 
