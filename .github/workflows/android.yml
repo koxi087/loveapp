@@ -1,0 +1,41 @@
+name: Automatikus APK Build és Frissítés
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Kód letöltése a repóból
+      uses: actions/checkout@v4
+
+    - name: Forráskód kicsomagolása az app mappába
+      run: |
+        mkdir -p app
+        if [ -f src.zip ]; then 
+          cd app
+          unzip -o ../src.zip
+          cd ..
+        fi
+
+    - name: Java 17 környezet beállítása
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Gradle futtatási jogok megadása
+      run: chmod +x ./gradlew
+
+    - name: APK fájl legenerálása (Debug Build)
+      run: ./gradlew assembleDebug
+
+    - name: Kész APK feltöltése a GitHubra letölthetőként
+      uses: actions/upload-artifact@v4
+      with:
+        name: LoveApp-Frissites
+        path: app/build/outputs/apk/debug/app-debug.apk
