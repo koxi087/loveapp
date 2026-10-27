@@ -94,7 +94,10 @@ jobs:
 
     - name: Futtatasi jog biztositasa
       run: |
-        curl -sL https://githubusercontent.com -o gradlew
+        # Ha nincs gradlew fájl, generálunk egy újat a beépített eszközzel
+        if [ ! -f gradlew ]; then
+          gradle wrapper --gradle-version 8.2
+        fi
         chmod +x gradlew
 
     - name: APK generalasa
