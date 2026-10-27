@@ -13,14 +13,26 @@ jobs:
     - name: Kód letöltése a repóból
       uses: actions/checkout@v4
 
-    - name: Forráskód kicsomagolása az app mappába
+    - name: Mappaszerkezet helyreállítása a szerveren
       run: |
+        # Létrehozzuk az app mappát a szerveren
         mkdir -p app
-        if [ -f src.zip ]; then 
+        
+        # Átmozgatjuk az app-szintű gradle fájlt a helyére
+        if [ -f build.gradle.kts ]; then
+          mv build.gradle.kts app/
+        fi
+        
+        # Kicsomagoljuk a forráskódot az app mappába
+        if [ -f src.zip ]; then
           cd app
           unzip -o ../src.zip
+          rm ../src.zip
           cd ..
         fi
+        
+        # Legenerálunk egy üres, de kötelező felső szintű build fájlt a gyökérbe
+        echo 'plugins { alias(libs.plugins.android.application) apply false; alias(libs.plugins.kotlin.android) apply false }' > build.gradle.kts
 
     - name: Java 17 környezet beállítása
       uses: actions/setup-java@v4
