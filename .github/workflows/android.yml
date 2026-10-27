@@ -39,9 +39,10 @@ jobs:
           rm -f src.zip
         fi
 
-    - name: Gradle Wrapper JAR letöltése a helyére
+    - name: Gradle Wrapper JAR felépítése helyben
       run: |
-        curl -sL https://githubusercontent.com -o gradle/wrapper/gradle-wrapper.jar
+        # Letöltés helyett legenerálunk egy működő minimális Gradle indítót
+        gradle wrapper --gradle-version 8.2
 
     - name: Futtatasi jog megadasa a megleveo gradlew fajlnak
       run: chmod +x gradlew
