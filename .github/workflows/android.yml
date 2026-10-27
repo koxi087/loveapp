@@ -24,12 +24,6 @@ jobs:
         mkdir -p app
         mkdir -p gradle/wrapper
 
-    - name: Konfiguracios fajlok helyreallitasa
-      run: |
-        if [ -f build.gradle.kts ]; then mv build.gradle.kts app/; fi
-        echo 'plugins { id("com.android.application") version "8.2.0" apply false; id("org.jetbrains.kotlin.android") version "1.9.0" apply false }' > build.gradle.kts
-        echo -e "distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionUrl=https\\\\://services.gradle.org/distributions/gradle-8.2-bin.zip\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists" > gradle/wrapper/gradle-wrapper.properties
-
     - name: Forraskod kicsomagolasa
       run: |
         if [ -f src.zip ]; then
@@ -39,13 +33,70 @@ jobs:
           rm -f src.zip
         fi
 
-    - name: Gradle Wrapper JAR felépítése helyben
+    - name: Hibas build gradle faluiras es helyreallitas
       run: |
-        # Letöltés helyett legenerálunk egy működő minimális Gradle indítót
-        gradle wrapper --gradle-version 8.2
+        # Legenerálunk egy fix, független globális konfigurációt
+        echo 'plugins { id("com.android.application") version "8.2.0" apply false; id("org.jetbrains.kotlin.android") version "1.9.0" apply false }' > build.gradle.kts
+        
+        # Felülírjuk az app szintű fájlt egy olyan verzióra, amihez nem kell a hiányzó libs verziókatalógus
+        cat << 'EOF' > app/build.gradle.kts
+        plugins {
+            id("com.android.application")
+            id("org.jetbrains.kotlin.android")
+        }
 
-    - name: Futtatasi jog megadasa a megleveo gradlew fajlnak
-      run: chmod +x gradlew
+        android {
+            namespace = "com.example.first"
+            compileSdk = 34
+
+            defaultConfig {
+                applicationId = "com.example.first"
+                minSdk = 24
+                targetSdk = 34
+                versionCode = 1
+                versionName = "1.0"
+                testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+                vectorDrawables { useSupportLibrary = true }
+            }
+
+            buildTypes {
+                release {
+                    isMinifyEnabled = false
+                    proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+                }
+            }
+            compileOptions {
+                sourceCompatibility = JavaVersion.VERSION_17
+                targetCompatibility = JavaVersion.VERSION_17
+            }
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+            buildFeatures { compose = true }
+            composeOptions { kotlinCompilerExtensionVersion = "1.5.1" }
+            packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
+        }
+
+        dependencies {
+            implementation("androidx.core:core-ktx:1.12.0")
+            implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+            implementation("androidx.activity:activity-compose:1.8.2")
+            implementation(platform("androidx.compose:compose-bom:2023.08.0"))
+            implementation("androidx.compose.ui:ui")
+            implementation("androidx.compose.ui:ui-graphics")
+            implementation("androidx.compose.ui:ui-tooling-preview")
+            implementation("androidx.compose.material3:material3")
+            implementation("androidx.compose.material:material-icons-extended:1.6.1")
+        }
+        EOF
+
+        # Beállítjuk a tiszta Gradle indítót
+        echo -e "distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionUrl=https\\\\://services.gradle.org/distributions/gradle-8.2-bin.zip\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists" > gradle/wrapper/gradle-wrapper.properties
+
+    - name: Futtatasi jog biztosítása
+      run: |
+        curl -sL https://githubusercontent.com -o gradlew
+        chmod +x gradlew
 
     - name: APK generalasa
       run: ./gradlew assembleDebug --no-daemon
